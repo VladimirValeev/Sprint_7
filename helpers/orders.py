@@ -1,33 +1,34 @@
-import requests
+# helpers/orders.py
 
-from helpers.urls import CREATE_ORDER_URL, ORDERS_LIST_URL
+import random
+
+from helpers.http import get, post
+from helpers.urls import CREATE_ORDER_URL, GET_ORDERS_LIST_URL
 
 
-def generate_order_payload(colors=None) -> dict:
+def generate_order_payload(colors):
+    # минимально достаточный корректный payload под учебный API
     payload = {
-        "firstName": "Test",
-        "lastName": "User",
-        "address": "Москва, Красная площадь, 1",
+        "firstName": "Naruto",
+        "lastName": "Uchiha",
+        "address": "Konoha, 142 apt.",
         "metroStation": 4,
-        "phone": "+79999999999",
-        "rentTime": 3,
+        "phone": "+7 800 355 35 35",
+        "rentTime": 5,
         "deliveryDate": "2025-12-31",
-        "comment": "Тестовый заказ",
+        "comment": f"Test order {random.randint(1, 10_000)}",
     }
 
-    # если colors передан:
-    # - [] → отправится пустой список
-    # - ["BLACK"] / ["GREY"] / ["BLACK", "GREY"]
-    # если colors == None → поле color не добавляем вообще
+    # цвет может быть None (поле не передаём)
     if colors is not None:
         payload["color"] = colors
 
     return payload
 
 
-def create_order(payload: dict) -> requests.Response:
-    return requests.post(CREATE_ORDER_URL, json=payload, timeout=30)
+def create_order(payload: dict):
+    return post(CREATE_ORDER_URL, payload, step_name="Создать заказ")
 
 
-def get_orders_list() -> requests.Response:
-    return requests.get(ORDERS_LIST_URL, timeout=30)
+def get_orders_list():
+    return get(GET_ORDERS_LIST_URL, step_name="Получить список заказов")

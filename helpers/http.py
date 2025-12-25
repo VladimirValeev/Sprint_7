@@ -1,25 +1,21 @@
+# helpers/http.py
+
+import allure
 import requests
-from requests.exceptions import ReadTimeout, ConnectionError
+
+DEFAULT_TIMEOUT = 15
 
 
-DEFAULT_TIMEOUT = 30
+def post(url: str, payload: dict | None = None, step_name: str = "POST request"):
+    with allure.step(f"{step_name}: POST {url}"):
+        return requests.post(url, json=payload, timeout=DEFAULT_TIMEOUT)
 
 
-def post(url: str, data: dict | None = None, timeout: int = DEFAULT_TIMEOUT, retries: int = 1) -> requests.Response:
-    last_exc = None
-    for _ in range(retries + 1):
-        try:
-            return requests.post(url, data=data, timeout=timeout)
-        except (ReadTimeout, ConnectionError) as exc:
-            last_exc = exc
-    raise last_exc
+def get(url: str, params: dict | None = None, step_name: str = "GET request"):
+    with allure.step(f"{step_name}: GET {url}"):
+        return requests.get(url, params=params, timeout=DEFAULT_TIMEOUT)
 
 
-def delete(url: str, timeout: int = DEFAULT_TIMEOUT, retries: int = 1) -> requests.Response:
-    last_exc = None
-    for _ in range(retries + 1):
-        try:
-            return requests.delete(url, timeout=timeout)
-        except (ReadTimeout, ConnectionError) as exc:
-            last_exc = exc
-    raise last_exc
+def delete(url: str, step_name: str = "DELETE request"):
+    with allure.step(f"{step_name}: DELETE {url}"):
+        return requests.delete(url, timeout=DEFAULT_TIMEOUT)
